@@ -33,7 +33,7 @@ No installation is required for WebDiffusion. Simply open the web application in
 
 ## Contributing
 
-We welcome contributions to improve WebDiffusion. If you encounter any issues or have suggestions for new features, please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/your-username/web-diffusion).
+We welcome contributions to improve WebDiffusion. If you encounter any issues or have suggestions for new features, please feel free to open an issue or submit a pull request on the [GitHub repository](https://github.com/AVsync-LIVE/WebDiffusion/issues).
 
 ## License
 
