@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>WebDiffusion</title>
+    <link rel="stylesheet" type="text/css" href="/assets/css/index.css">
+</head>
+<body>
+    <script src="dist/tvmjs_runtime.wasi.js"></script>
+    <script src="dist/tvmjs.bundle.js"></script>
+
+    <div class="container">
+        <div class="input-column">
+            <h1>WebDiffusion</h1>
+            <p>Create images in your browser with Stable Diffusion - secure, free, and no installation required.</p>
+            <p>Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</p>
+            <label for="inputPrompt">Input Prompt:</label>
+            <textarea name="inputPrompt" id="inputPrompt">Art nouveau stained glass hummingbird</textarea>
+
+            <label for="negativePrompt">Negative Prompt:</label>
+            <textarea name="negativePrompt" id="negativePrompt"  value=""></textarea>
+            <button onclick="tvmjsGlobalEnv.asyncOnGenerate()">Generate</button>
+        </div>
+
+        <div class="output-column">
+            <canvas id="canvas" width="512" height="512"></canvas>
+            <div id="log"></div>
+        </div>
+    </div>
+
+    <script>
+        var tvmjsGlobalEnv = tvmjsGlobalEnv || {};
+
+        function downloadCanvas() {
+            const canvas = document.getElementById("canvas");
+            const prompt = document.getElementById("inputPrompt").value.trim();
+            const filename = prompt ? prompt + ".png" : "canvas.png";
+
+            const downloadLink = document.createElement("a");
+            downloadLink.href = canvas.toDataURL("image/png");
+            downloadLink.download = filename;
+            downloadLink.click();
+        }
+    </script>
+
+    <script type="module">
+        import init, { TokenizerWasm } from "./dist/tokenizers-wasm/tokenizers_wasm.js";
+
+        var initialized = false;
+        async function getTokenizer(name) {
+            if (!initialized) {
+                await init();
+            }
+            const jsonText = await (await fetch("https://huggingface.co/" + name + "/raw/main/tokenizer.json")).text();
+            return new TokenizerWasm(jsonText);
+        }
+
+        tvmjsGlobalEnv.getTokenizer = getTokenizer;
+    </script>
+
+    <script src="dist/stable_diffusion.js"></script>
+
+    <script>
+        document.getElementById("log").innerHTML = `
+            <label id="gpu-tracker-label">Note: A ~2GB model will be downloaded the first time you generate.</label><br />
+            <label id="progress-tracker-label"></label><br />
+            <progress id="progress-tracker-progress" max="100" value="0"></progress>
+        `;
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #121212; /* Dark mode background color */
+    color: #ffffff; /* Text color */
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.input-column {
+    width: 95%;
+    max-width: 500px;
+    margin: 8px 0; /* Updated margin value */
+}
+
+.input-column input[type="text"],
+.input-column select, textarea {
+    width: 100%;
+    box-sizing: border-box; /* Include padding and border in the width */
+    padding: 8px; /* Updated padding value */
+    margin: 8px 0; /* Updated margin value */
+    border: 1px solid #888; /* Less bright outline color */
+    border-radius: 4px;
+    background-color: #1f1f1f; /* Dark mode input background color */
+    color: #ffffff; /* Input text color */
+    font-family: Arial;
+}
+
+button {
+    display: inline-block;
+    padding: 8px 16px; /* Updated padding value */
+    margin-top: 8px;
+    width: 100%;
+    background-color: #7A120B; /* Button background color */
+    color: #ffffff; /* Button text color */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    text-decoration: none;
+}
+
+button:hover {
+    background-color: #8e1a0d; /* Button background color on hover */
+}
+
+#canvas {
+    display: block;
+    margin: 16px auto; /* Updated margin value */
+    background: url('/img/empty.svg');
+    background-repeat: repeat;
+    background-size: auto;
+    background-size: 301px;
+    border: 1px solid #888; /* Less bright outline color */
+}
+
+#log {
+    width: calc(100% - 16px);
+    max-width: 498px;
+    padding: 8px; /* Updated padding value */
+    border: 1px solid #888; /* Less bright outline color */
+    border-radius: 4px;
+    background-color: #1f1f1f; /* Dark mode log background color */
+    color: #ffffff; /* Log text color */
+}
+
+#progress-tracker-progress {
+    height: 8px;
+    width: 100%;
+    margin-top: 8px;
+    -webkit-appearance: none;
+   appearance: none;
+   background-color: #c00c00;
+}
+
+/* Chrome */
+#progress-tracker-progress::-webkit-progress-bar {
+    background-color: #1f1f1f;
+}
+#progress-tracker-progress::-webkit-progress-value {
+    background-color: #c00c00;
+}
+
+/* Firefox */
+#progress-tracker-progress::-moz-progress-bar {
+    background-color: #c00c00;
+}
+
+/* Styling for labels */
+label {
+    font-size: 12px; /* Font size */
+    color: #ccc; /* Label text color */
+}
+
+p {
+    color: #ccc; /* Label text color */
+}
+
+/* Media query for wide screens */
+@media (min-width: 1200px) {
+    .container {
+        flex-direction: row;
+    }
+    .input-column {
+        max-width: 400px;
+        margin-right: 16px; /* Updated margin value */
+    }
+    .output-column {
+        max-width: 800px;
+        margin-left: 16px; /* Updated margin value */
+    }
+}
