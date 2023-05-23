@@ -2,7 +2,9 @@
 
 Create images in your browser with Stable Diffusion - secure, free, and no installation required.
 
-![image](https://github.com/AVsync-LIVE/WebDiffusion/assets/18317587/e74ce41e-e005-4420-b9d8-269670efbb9f)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/0a805a61-907b-437b-9d3b-44d166041a8d/deploy-status)](https://app.netlify.com/sites/webdiffusion/deploys)
+
+![image](https://github.com/AVsync-LIVE/WebDiffusion/assets/18317587/56406034-4225-4c8e-9222-89ba5b27674c)
 
 Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.
 
