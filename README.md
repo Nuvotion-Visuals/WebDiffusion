@@ -2,21 +2,18 @@
 
 Create images in your browser with Stable Diffusion - secure, free, and no installation required.
 
+![image](https://github.com/AVsync-LIVE/WebDiffusion/assets/18317587/e74ce41e-e005-4420-b9d8-269670efbb9f)
+
 Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.
 
 WebDiffusion is a modified version of (mlc-ai/web-stable-diffusion)[https://github.com/mlc-ai/web-stable-diffusion] that comes with all the required files. You don't need to install Python, any pip dependencies, or execute build commands. We have eliminated unnecessary code, providing a straightforward and convenient experience.
 
 ## Table of Contents
 
-- [Introduction](#introduction)
 - [Installation](#installation)
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-
-## Introduction
-
-WebDiffusion is a web application that allows you to generate images in your browser using Stable Diffusion. It provides a user-friendly interface where you can input prompts and generate corresponding images without the need for any local installation. The application leverages the power of GPUs with 8GB VRAM or M1/M2 Macs for optimal performance.
 
 ## Installation
 
