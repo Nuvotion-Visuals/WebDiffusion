@@ -13,29 +13,37 @@
 <body>
     <script src="dist/tvmjs_runtime.wasi.js"></script>
     <script src="dist/tvmjs.bundle.js"></script>
-
-    <div class="container">
+    <script src="assets/js/jszip.min.js"></script>
+    <script src="assets/js/localforage.min.js"></script>
+    <div class="content">
         <div class="input-column">
-            <span>
-                <img id='logo' src="img/webdiffusion-typography.svg" alt="WebDiffusion"/>
-            </span>
-            <p>Create images in your browser with Stable Diffusion - secure, free, and no installation required.</p>
-            <p>Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</p>
+            <img id='logo' src="img/webdiffusion-typography.svg" alt="WebDiffusion"/>
+
+            <p>Create images in your browser with Stable Diffusion - secure, free, unlimited, and no installation required.</p>
+            
             <label for="inputPrompt">Prompt</label>
             <textarea name="inputPrompt" id="inputPrompt">radial organic reaction diffusion icon svg black and white thick</textarea>
 
             <label for="negativePrompt">Negative Prompt</label>
             <textarea name="negativePrompt" id="negativePrompt"  value=""></textarea>
+
+            <label for="generateCount">Generate Count</label>
+            <input type="number" id="generateCount" value="1">
+
             <button onclick="tvmjsGlobalEnv.asyncOnGenerate()" id="generate">Generate</button>
-        </div>
 
-        <div class="output-column">
-            <canvas id="canvas" width="512" height="512"></canvas>
-            <button type="button" onClick="downloadCanvas()">Download</button>
             <div id="log"></div>
-        </div>
-    </div>
 
+            <p>Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</p>
+        </div>
+    <div id="output">
+    <progress id="progress-tracker-progress" max="100" value="0"></progress>
+    <div id="slider-container">
+        <input type="range" id="slider" min="128" max="512" step="64" value="256">
+      </div>
+
+    </div>
+    </div>
     <script>
         var tvmjsGlobalEnv = tvmjsGlobalEnv || {};
 
@@ -72,9 +80,101 @@
         document.getElementById("log").innerHTML = `
             <label id="gpu-tracker-label">Note: A ~2GB model will be downloaded the first time you generate.</label><br />
             <label id="progress-tracker-label"></label><br />
-            <progress id="progress-tracker-progress" max="100" value="0"></progress>
+            
         `;
+
+        // Get references to the slider and its value label
+        const slider = document.getElementById('slider');
+        const sliderValue = document.getElementById('slider-value');
+
+        // Add an event listener to update the CSS variable and label when the slider value changes
+        slider.addEventListener('input', () => {
+        const value = slider.value;
+        document.documentElement.style.setProperty('--grid-column-width', value + 'px');
+        sliderValue.textContent = `Grid Template Columns: ${value}px`;
+        });
     </script>
+
+    <script async>
+        window.addEventListener('DOMContentLoaded', (event) => {
+            // Iterate over all items in the store
+            localforage.iterate(function(value, key, iterationNumber) {
+                const { blob, inputPrompt, negativePrompt } = value;
+
+                // Create a container
+                let container = document.createElement('div');
+                container.className = 'image-container'; // Add a class for styling
+
+                // Create an image
+                let img = new Image();
+                img.className = 'generated-image'; // Add a class for styling
+                img.onload = function() {
+                    // Add prompts to the container
+                    let inputPromptElem = document.createElement('p');
+                    inputPromptElem.textContent = inputPrompt;
+                    inputPromptElem.className = 'input-prompt'; // Add a class for styling
+                    container.appendChild(inputPromptElem);
+
+                    let negativePromptElem = document.createElement('p');
+                    negativePromptElem.textContent = negativePrompt;
+                    negativePromptElem.className = 'negative-prompt'; // Add a class for styling
+                    container.appendChild(negativePromptElem);
+
+                    // Append the image to the container
+                    container.appendChild(img);
+
+                    // Create a download button
+                    let btn = document.createElement('button');
+                    btn.textContent = 'Download';
+                    btn.className = 'download-button'; // Add a class for styling
+                    btn.onclick = function() {
+                        // Create an anchor element and simulate a click
+                        let a = document.createElement('a');
+                        a.href = img.src;
+                        a.download = `${inputPrompt} - ${negativePrompt}.png`;
+                        a.style.display = 'none';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    };
+
+                    // Append the download button to the container
+                    container.appendChild(btn);
+
+                    // Create a delete button
+                    let delBtn = document.createElement('button');
+                    delBtn.textContent = 'X';
+                    delBtn.className = 'delete-button'; // Add a class for styling
+                    delBtn.onclick = function() {
+                        // Remove the container from the DOM
+                        outputContainer.removeChild(container);
+
+                        // Remove the corresponding data from IndexedDB
+                        localforage.removeItem(key);
+                    };
+
+                    // Append the delete button to the container
+                    container.appendChild(delBtn);
+
+                    // Get a reference to the first child of the outputContainer
+                    const outputContainer = document.getElementById("output");
+
+                    let firstChild = outputContainer.firstChild;
+
+                    // Insert the new container before the first child
+                    outputContainer.insertBefore(container, firstChild);
+                };
+
+                img.src = URL.createObjectURL(blob);
+            }).then(function() {
+                console.log('Iteration has completed');
+            }).catch(function(err) {
+                // This code runs if there were any errors
+                console.error(err);
+            });
+        });
+    </script>
+
      <script>
         // Check to make sure the browser supports service workers
       if ('serviceWorker' in navigator) {

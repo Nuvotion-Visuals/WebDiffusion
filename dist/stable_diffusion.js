@@ -180,6 +180,7 @@ class TVMDPMSolverMultistepScheduler {
   }
 }
 
+let offscreen
 class StableDiffusionPipeline {
   constructor(tvm, tokenizer, schedulerConsts, cacheMetadata) {
     if (cacheMetadata == undefined) {
@@ -190,7 +191,8 @@ class StableDiffusionPipeline {
     this.maxTokenLength = 77;
 
     this.device = this.tvm.webgpu();
-    this.tvm.bindCanvas(document.getElementById("canvas"));
+    offscreen = new OffscreenCanvas(512, 512)
+    this.tvm.bindCanvas(offscreen);
     // VM functions
     this.vm = this.tvm.detachFromCurrentScope(
       this.tvm.createVirtualMachine(this.device)
@@ -604,8 +606,92 @@ class StableDiffusionInstance {
 localStableDiffusionInst = new StableDiffusionInstance();
 
 tvmjsGlobalEnv.asyncOnGenerate = async function () {
-  await localStableDiffusionInst.generate();
+  const count = parseInt(document.getElementById("generateCount").value);
+  const outputContainer = document.getElementById("output");
+
+  for (let i = 0; i < count; i++) {
+    await localStableDiffusionInst.generate();
+
+    // Capture the prompts at the time of generation
+    const inputPrompt = document.getElementById('inputPrompt').value;
+    const negativePrompt = document.getElementById('negativePrompt').value;
+
+    // Convert offscreen canvas to ImageBitmap
+    offscreen.convertToBlob().then(blob => {
+      let imgUrl = URL.createObjectURL(blob);
+
+      let timestamp = Date.now().toString();
+
+      localforage.setItem(timestamp, { blob, inputPrompt, negativePrompt });
+
+      // Create a container
+      let container = document.createElement('div');
+      container.className = 'image-container'; // Add a class for styling
+
+      // Add prompts to the container
+      let inputPromptElem = document.createElement('p');
+      inputPromptElem.textContent = inputPrompt;
+      inputPromptElem.className = 'input-prompt'; // Add a class for styling
+      container.appendChild(inputPromptElem);
+
+      let negativePromptElem = document.createElement('p');
+      negativePromptElem.textContent = negativePrompt;
+      negativePromptElem.className = 'negative-prompt'; // Add a class for styling
+      container.appendChild(negativePromptElem);
+
+      // Create an image
+      let img = new Image();
+      img.className = 'generated-image'; // Add a class for styling
+      img.onload = function() {
+        // Append the image to the container
+        container.appendChild(img);
+
+        // Create a download button
+        let btn = document.createElement('button');
+        btn.textContent = 'Download';
+        btn.className = 'download-button'; // Add a class for styling
+        btn.onclick = function() {
+          // Create an anchor element and simulate a click
+          let a = document.createElement('a');
+          a.href = imgUrl;
+          a.download = `${inputPrompt} - ${negativePrompt}.png`;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        };
+
+        // Append the download button to the container
+        container.appendChild(btn);
+
+        // Create a delete button
+        let delBtn = document.createElement('button');
+        delBtn.textContent = 'X';
+        delBtn.className = 'delete-button'; // Add a class for styling
+        delBtn.onclick = function() {
+          // Remove the container from the DOM
+          outputContainer.removeChild(container);
+
+          // Remove the corresponding data from IndexedDB
+          localforage.removeItem(timestamp);
+        };
+
+        // Append the delete button to the container
+        container.appendChild(delBtn);
+
+        // Get a reference to the first child of the outputContainer
+        let firstChild = outputContainer.firstChild;
+
+        // Insert the new container before the first child
+        outputContainer.insertBefore(container, firstChild);
+
+        document.getElementById("progress-tracker-progress").value = 0;
+      };
+      img.src = imgUrl;
+    });
+  }
 };
+
 
 tvmjsGlobalEnv.asyncOnRPCServerLoad = async function (tvm) {
   const inst = new StableDiffusionInstance();

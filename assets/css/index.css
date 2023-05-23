@@ -2,14 +2,18 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #121212;
+    background-color: black;
     color: #ffffff;
+}
+
+:root {
+    --grid-column-width: 256px;
 }
 
 #logo {
     width: 100%;
     max-width: 300px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
     margin-top: 4px;
 }
 
@@ -17,26 +21,39 @@ span {
     width: 100%;
 }
 
-.container {
+.content {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 0 16px;
 }
 
 .input-column {
-    width: 100%;
+    width: calc(100% - 32px);
     max-width: 500px;
-    margin: 8px 0;
+    padding: 8px 16px;
+    height: calc(100vh - 16px);
     display: flex;
     flex-direction: column;
     align-items: center;
     text-align: left;
+    background-color: #121212;
 }
 
 .input-column input[type="text"],
 .input-column select, textarea {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px;
+    margin: 8px 0;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    color: #ffffff;
+    font-family: Arial;
+}
+
+.input-column input[type="number"] {
     width: 100%;
     box-sizing: border-box;
     padding: 8px;
@@ -73,37 +90,33 @@ button:hover {
     background-color: #8e1a0d;
 }
 
-#canvas {
-    display: block;
-    margin: 16px auto;
-    margin-bottom: 8px;
-    background: url('/img/empty.svg');
-    background-repeat: repeat;
-    background-size: auto;
-    background-size: 301px;
-    border: 1px solid #888;
-    max-width: calc(100vw - 32px);
-}
-
 #log {
     width: calc(100% - 16px);
     max-width: 498px;
     padding: 8px;
     border: 1px solid #888;
     border-radius: 4px;
-    margin-top: 16px;
+    margin: 16px 0;
     background-color: #1f1f1f;
     color: #ffffff;
 }
 
 #progress-tracker-progress {
-    height: 8px;
+    position: fixed;
+    z-index: 99;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 4px;
     width: 100%;
-    margin-top: 8px;
     -webkit-appearance: none;
     appearance: none;
     background-color: #c00c00;
     transition: all .3s ease-in;
+    -webkit-transition: width 5s ease;
+    -moz-transition: width 5s ease;
+    -o-transition: width 5s ease;
+    transition: width 5s ease;
 }
 
 #progress-tracker-progress::-webkit-progress-bar {
@@ -132,21 +145,103 @@ p {
     margin-bottom: 12px;
 }
 
-@media (min-width: 1200px) {
-    .container {
+#output {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(var(--grid-column-width), 1fr));
+    grid-gap: 16px;
+    padding: 16px;
+    margin-top: 16px;
+    width: 100%;
+    position: relative;
+  }
+
+.image-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #888;
+    border-radius: 4px;
+    background-color: #1f1f1f;
+    padding: 16px;
+    align-self: start;
+}
+
+.delete-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px;
+    width: 32px;
+    height: 32px;
+    margin: 0;
+}
+
+.generated-image {
+    max-width: 100%;
+    margin-bottom: 12px;
+}
+
+.download-button {
+    margin-top: 8px;
+}
+
+.input-prompt,
+.negative-prompt {
+    font-size: 12px;
+    color: #ccc;
+    margin-top: 4px;
+}
+
+#slider {
+    position: absolute;
+    top: -2px;
+    right: 16px;
+    width: 100px;
+    background-color: #1f1f1f;
+    height: 4px;
+    outline: none;
+    appearance: none;
+  }
+  
+  #slider::-webkit-slider-thumb {
+    appearance: none;
+    width: 12px;
+    height: 12px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+  
+  #slider::-moz-range-thumb {
+    width: 12px;
+    height: 12px;
+    background-color: #ccc;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+  }
+
+@media screen and (min-width: 768px) {
+    .content {
         flex-direction: row;
-        justify-content: center;
-        align-items: start;
+        display: flex;
+        align-items: flex-start;
     }
 
     .input-column {
-        margin-right: 16px;
         width: 100%;
-        max-width: 500px;
+        max-width: 400px;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
     }
-
-    .output-column {
-        max-width: 800px;
-        margin-left: 16px;
+    
+    #output {
+        margin-left: 432px;
+        width: calc(calc(100% - 400px) - 64px);
     }
 }
