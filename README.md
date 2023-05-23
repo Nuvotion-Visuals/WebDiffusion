@@ -2,6 +2,8 @@
 
 Create images in your browser with Stable Diffusion - secure, free, and no installation required.
 
+[Start generating images](https://webdiffusion.avsync.live)
+
 ![image](https://github.com/AVsync-LIVE/WebDiffusion/assets/18317587/56406034-4225-4c8e-9222-89ba5b27674c)
 
 Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.
