@@ -6,7 +6,7 @@ Create images in your browser with Stable Diffusion - secure, free, and no insta
 
 Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.
 
-WebDiffusion is a modified version of (mlc-ai/web-stable-diffusion)[https://github.com/mlc-ai/web-stable-diffusion] that comes with all the required files. You don't need to install Python, any pip dependencies, or execute build commands. We have eliminated unnecessary code, providing a straightforward and convenient experience.
+WebDiffusion is a modified version of [mlc-ai/web-stable-diffusion](https://github.com/mlc-ai/web-stable-diffusion) that comes with all the required files. You don't need to install Python, any pip dependencies, or execute build commands. We have eliminated unnecessary code, providing a straightforward and convenient experience.
 
 ## Table of Contents
 
