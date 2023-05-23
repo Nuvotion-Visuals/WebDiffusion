@@ -2,7 +2,13 @@
 <html>
 <head>
     <title>WebDiffusion</title>
+    <meta property="og:title" content="WebDiffusion">
+    <meta property="og:description" content="Create images in your browser with Stable Diffusion - secure, free, and no installation required.">
+    <meta property="og:image" content="img/webdiffusion-social-share.png">
     <link rel="stylesheet" type="text/css" href="/assets/css/index.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#121212">
 </head>
 <body>
     <script src="dist/tvmjs_runtime.wasi.js"></script>
@@ -10,19 +16,22 @@
 
     <div class="container">
         <div class="input-column">
-            <h1>WebDiffusion</h1>
+            <span>
+                <img id='logo' src="img/webdiffusion-typography.svg" alt="WebDiffusion"/>
+            </span>
             <p>Create images in your browser with Stable Diffusion - secure, free, and no installation required.</p>
             <p>Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</p>
-            <label for="inputPrompt">Input Prompt:</label>
-            <textarea name="inputPrompt" id="inputPrompt">Art nouveau stained glass hummingbird</textarea>
+            <label for="inputPrompt">Prompt</label>
+            <textarea name="inputPrompt" id="inputPrompt">radial organic reaction diffusion icon svg black and white thick</textarea>
 
-            <label for="negativePrompt">Negative Prompt:</label>
+            <label for="negativePrompt">Negative Prompt</label>
             <textarea name="negativePrompt" id="negativePrompt"  value=""></textarea>
-            <button onclick="tvmjsGlobalEnv.asyncOnGenerate()">Generate</button>
+            <button onclick="tvmjsGlobalEnv.asyncOnGenerate()" id="generate">Generate</button>
         </div>
 
         <div class="output-column">
             <canvas id="canvas" width="512" height="512"></canvas>
+            <button type="button" onClick="downloadCanvas()">Download</button>
             <div id="log"></div>
         </div>
     </div>
@@ -33,7 +42,7 @@
         function downloadCanvas() {
             const canvas = document.getElementById("canvas");
             const prompt = document.getElementById("inputPrompt").value.trim();
-            const filename = prompt ? prompt + ".png" : "canvas.png";
+            const filename = prompt ? prompt + ".png" : "webdiffusion.png";
 
             const downloadLink = document.createElement("a");
             downloadLink.href = canvas.toDataURL("image/png");
@@ -66,5 +75,18 @@
             <progress id="progress-tracker-progress" max="100" value="0"></progress>
         `;
     </script>
+     <script>
+        // Check to make sure the browser supports service workers
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker
+          .register('/service-worker.js')
+          .then(() => {
+            console.log('Service worker registered');
+          })
+          .catch(err => {
+            console.log('Service worker registration failed: ' + err);
+          });
+      }
+      </script>
 </body>
 </html>
