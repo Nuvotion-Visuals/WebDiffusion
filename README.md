@@ -29,7 +29,7 @@ No installation is required for WebDiffusion. Simply open the web application in
 4. Optionally, you can provide a negative prompt in the "Negative Prompt" text area.
 5. Click on the "Generate" button to initiate the image generation process.
 6. The generated image will be displayed in the canvas area on the right side of the screen.
-7. You can download the generated image by clicking on the canvas and selecting the "Save Image As" option.
+7. You can download the generated image by clicking the "Download" button. The file will have the same name as the prompt.
 
 ## Contributing
 
