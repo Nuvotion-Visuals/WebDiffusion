@@ -19,9 +19,10 @@ WebDiffusion is a modified version of [mlc-ai/web-stable-diffusion](https://gith
 - 📥 Download button available for saving files (utilizes prompt for the file name)
 - 🌐 Entirely static files, making it easy to host for free
 
-## Limitations
+## Current Limitations
 
 - All generated images are 512x512
+- The only way to cancel generation is refreshing the page
 
 ## Usage
 
