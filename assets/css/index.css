@@ -21,7 +21,7 @@ body {
 #logo {
     width: 100%;
     max-width: 300px;
-    margin-bottom: 12px;
+    margin-bottom: 8px;
 }
 
 #preview {
@@ -162,11 +162,16 @@ label {
     margin-top: 4px;
 }
 
+.input-column p {
+ line-height: 1.5;
+}
+
 p {
     color: #ccc;
     margin: 0;
     padding: 0;
     margin-bottom: 12px;
+    font-size: 13px;
 }
 
 #output {
