@@ -8,13 +8,26 @@ body {
 
 :root {
     --grid-column-width: 256px;
+    --Background: #121212;
+    --Background_Alternating: hsl(0, 0%, 6%);
+
+    --Surface_0_Variant: hsl(0, 0%, 11%);
+    --Surface_0: hsl(0, 0%, 11%);
+    --Surface: #2A2A2A;
+    --Surface_1: #404040;
+    --Surface_2: #575757;
 }
 
 #logo {
     width: 100%;
     max-width: 300px;
-    margin-bottom: 8px;
-    margin-top: 4px;
+    margin-bottom: 12px;
+}
+
+#preview {
+    width: 100%;
+    background-image: url('/img/empty.svg');
+    background-size: 301px;
 }
 
 span {
@@ -37,7 +50,7 @@ span {
     flex-direction: column;
     align-items: center;
     text-align: left;
-    background-color: #121212;
+    background-color: var(--Background);
 }
 
 .input-column input[type="text"],
@@ -46,11 +59,17 @@ span {
     box-sizing: border-box;
     padding: 8px;
     margin: 8px 0;
-    border: 1px solid #888;
+    border: 1px solid var(--Surface_2);
     border-radius: 4px;
-    background-color: #1f1f1f;
+    background-color: var(--Surface_0);
     color: #ffffff;
     font-family: Arial;
+}
+
+textarea {
+    max-width: 100%;
+    min-width: 100%;
+    min-height: 100px;
 }
 
 .input-column input[type="number"] {
@@ -58,9 +77,9 @@ span {
     box-sizing: border-box;
     padding: 8px;
     margin: 8px 0;
-    border: 1px solid #888;
+    border: 1px solid var(--Surface_2);
     border-radius: 4px;
-    background-color: #1f1f1f;
+    background-color: var(--Surface_0);
     color: #ffffff;
     font-family: Arial;
 }
@@ -70,7 +89,7 @@ button {
     padding: 8px 16px;
     margin-top: 8px;
     width: 100%;
-    background-color: #292929;
+    background-color: var(--Surface);
     color: #ffffff;
     border: none;
     border-radius: 4px;
@@ -79,9 +98,14 @@ button {
 }
 
 button:hover {
-    background-color: #404040;
+    background-color: var(--Surface_1);
 }
 
+button:disabled {
+    background-color: var(--Surface) !important;
+    opacity: 0.5;
+    cursor: not-allowed;
+}
 #generate {
     background-color: #7A120B;
 }
@@ -94,20 +118,20 @@ button:hover {
     width: calc(100% - 16px);
     max-width: 498px;
     padding: 8px;
-    border: 1px solid #888;
+    padding-top: 12px;
+    padding-bottom: 0;
+    border: 1px solid var(--Surface);
     border-radius: 4px;
-    margin: 16px 0;
-    background-color: #1f1f1f;
-    color: #ffffff;
+    margin: 24px 0;
+    color: #bbb;
+    font-size: 12px;
 }
 
 #progress-tracker-progress {
-    position: fixed;
-    z-index: 99;
-    left: 0;
-    right: 0;
-    top: 0;
-    height: 4px;
+    margin-top: 19px;
+    margin-bottom: 11px;
+    height: 8px;
+    border-radius: 16px;
     width: 100%;
     -webkit-appearance: none;
     appearance: none;
@@ -120,7 +144,7 @@ button:hover {
 }
 
 #progress-tracker-progress::-webkit-progress-bar {
-    background-color: #1f1f1f;
+    background-color: var(--Surface_0);
 }
 
 #progress-tracker-progress::-webkit-progress-value {
@@ -153,6 +177,7 @@ p {
     margin-top: 16px;
     width: 100%;
     position: relative;
+    align-items: stretch;
   }
 
 .image-container {
@@ -161,45 +186,53 @@ p {
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    border: 1px solid #888;
     border-radius: 4px;
-    background-color: #1f1f1f;
-    padding: 16px;
-    align-self: start;
+    background-color: var(--Background);
+    padding: 8px;
+    align-self: flex-start;
+    flex: 1;
 }
 
 .delete-button {
     position: absolute;
-    top: 0;
-    right: 0;
+    top: 8px;
+    right: 8px;
     padding: 4px;
     width: 32px;
     height: 32px;
     margin: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .generated-image {
     max-width: 100%;
-    margin-bottom: 12px;
 }
 
 .download-button {
     margin-top: 8px;
 }
 
-.input-prompt,
-.negative-prompt {
+.input-prompt {
     font-size: 12px;
     color: #ccc;
     margin-top: 4px;
+    width: calc(100% - 38px);
+    margin-right: 32px;
+    height: 28px;
+    display: flex;
+    overflow-y: auto;
+    margin-bottom: 8px;
+
 }
 
 #slider {
     position: absolute;
-    top: -2px;
+    top: -4px;
     right: 16px;
     width: 100px;
-    background-color: #1f1f1f;
+    background-color: var(--Surface_0);
     height: 4px;
     outline: none;
     appearance: none;
@@ -209,7 +242,7 @@ p {
     appearance: none;
     width: 12px;
     height: 12px;
-    background-color: #ccc;
+    background-color: var(--Surface_2);
     border: none;
     border-radius: 50%;
     cursor: pointer;
@@ -245,3 +278,51 @@ p {
         width: calc(calc(100% - 400px) - 64px);
     }
 }
+
+#link {
+    display: flex;
+    align-items: center;
+    position: absolute;
+    bottom: 0;
+    width: calc(100% - 32px);
+    border-top: 1px solid var(--Surface);
+    padding: 16px;
+}
+
+#link a {
+    font-size: 13px;
+    color: #bbb;
+    text-decoration: underline;
+    display: flex;
+    gap: 8px;
+}
+
+#link img {
+    height: 18px;
+    color: #bbb;
+    text-decoration: underline;
+    display: flex;
+    gap: 8px;
+    margin-top: -1px;
+}
+
+::-webkit-scrollbar-corner {
+    background: var(--Surface_0);
+  }
+  ::-webkit-scrollbar {
+    width: .65rem;
+    height: .65rem;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--Background_Alternating);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--Surface_0);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--Surface_1);
+  }
+  ::-webkit-scrollbar-thumb:active {
+    background: var(--Surface_1);
+  }
+  

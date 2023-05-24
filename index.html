@@ -21,23 +21,21 @@
 
             <p>Create images in your browser with Stable Diffusion - secure, free, unlimited, and no installation required.</p>
             
-            <label for="inputPrompt">Prompt</label>
-            <textarea name="inputPrompt" id="inputPrompt">radial organic reaction diffusion icon svg black and white thick</textarea>
+            <textarea name="inputPrompt" id="inputPrompt" placeholder="Prompt [negative prompt]"></textarea>
 
-            <label for="negativePrompt">Negative Prompt</label>
-            <textarea name="negativePrompt" id="negativePrompt"  value=""></textarea>
-
-            <label for="generateCount">Generate Count</label>
+            <label for="generateCount">Images</label>
             <input type="number" id="generateCount" value="1">
 
-            <button onclick="tvmjsGlobalEnv.asyncOnGenerate()" id="generate">Generate</button>
+            <button onclick="tvmjsGlobalEnv.asyncOnGenerate()" id="generate" disabled>Generate</button>
 
             <div id="log"></div>
 
-            <p>Please ensure you have a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</p>
+            <div id="link">
+                <a href="https://avsync.live" target="_blank"><img id='link-icon' src='img/up-right-from-square-solid.svg' />Create audio-reactive visuals for free</a>
+            </div>
         </div>
     <div id="output">
-    <progress id="progress-tracker-progress" max="100" value="0"></progress>
+    
     <div id="slider-container">
         <input type="range" id="slider" min="128" max="512" step="64" value="256">
       </div>
@@ -78,8 +76,8 @@
 
     <script>
         document.getElementById("log").innerHTML = `
-            <label id="gpu-tracker-label">Note: A ~2GB model will be downloaded the first time you generate.</label><br />
-            <label id="progress-tracker-label"></label><br />
+            <div id="gpu-tracker-label">Requirements: a GPU with 8GB VRAM (or an M1/M2 Mac), and Chrome or Edge version 113 or higher.</div><br />
+            <div id="progress-tracker-label">Note: A ~2GB model will be loaded from the cache.</div><br />
             
         `;
 
@@ -94,6 +92,22 @@
         sliderValue.textContent = `Grid Template Columns: ${value}px`;
         });
     </script>
+
+<script>
+    // Get references to the textarea and generate button
+    const inputPrompt = document.getElementById('inputPrompt');
+    const generateButton = document.getElementById('generate');
+
+    // Add an event listener to the textarea to check its value
+    inputPrompt.addEventListener('input', function() {
+        // Disable the generate button if the textarea is empty
+        if (inputPrompt.value.trim() === '') {
+            generateButton.disabled = true;
+        } else {
+            generateButton.disabled = false;
+        }
+    });
+</script>
 
     <script async>
         window.addEventListener('DOMContentLoaded', (event) => {
@@ -115,11 +129,6 @@
                     inputPromptElem.className = 'input-prompt'; // Add a class for styling
                     container.appendChild(inputPromptElem);
 
-                    let negativePromptElem = document.createElement('p');
-                    negativePromptElem.textContent = negativePrompt;
-                    negativePromptElem.className = 'negative-prompt'; // Add a class for styling
-                    container.appendChild(negativePromptElem);
-
                     // Append the image to the container
                     container.appendChild(img);
 
@@ -131,7 +140,7 @@
                         // Create an anchor element and simulate a click
                         let a = document.createElement('a');
                         a.href = img.src;
-                        a.download = `${inputPrompt} - ${negativePrompt}.png`;
+                        a.download = `${inputPrompt}.png`;
                         a.style.display = 'none';
                         document.body.appendChild(a);
                         a.click();
@@ -143,7 +152,7 @@
 
                     // Create a delete button
                     let delBtn = document.createElement('button');
-                    delBtn.textContent = 'X';
+                    delBtn.textContent = '✕';
                     delBtn.className = 'delete-button'; // Add a class for styling
                     delBtn.onclick = function() {
                         // Remove the container from the DOM

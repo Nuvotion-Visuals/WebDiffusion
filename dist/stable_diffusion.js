@@ -282,7 +282,7 @@ class StableDiffusionPipeline {
     progressCallback = undefined,
     schedulerId = 0,
     vaeCycle = -1,
-    beginRenderVae = 10
+    beginRenderVae = 1
   ) {
     // Principle: beginScope/endScope in synchronized blocks,
     // this helps to recycle intermediate memories
@@ -528,6 +528,13 @@ class StableDiffusionInstance {
       text += ", " + Math.ceil(timeElapsed) + " secs elapsed.";
       document.getElementById("progress-tracker-label").innerHTML = text;
       document.getElementById("progress-tracker-progress").value = (counter / totalNumSteps) * 100;
+  
+      // Draw the offscreen canvas to the preview canvas each time progressCallback is called
+      let previewCanvas = document.getElementById('preview');
+      if (previewCanvas) {
+        let ctx = previewCanvas.getContext('2d');
+        ctx.drawImage(offscreen, 0, 0);
+      }
     }
     return progressCallback;
   }
@@ -580,9 +587,21 @@ class StableDiffusionInstance {
     this.requestInProgress = true;
     try {
       await this.asyncInit();
-      const prompt = document.getElementById("inputPrompt").value;
-      const negPrompt = document.getElementById("negativePrompt").value;
-      await this.pipeline.generate(prompt, negPrompt, this.#getProgressCallback(), 0, 2);
+      const fullPrompt = document.getElementById('inputPrompt').value;
+      const promptMatches = [...fullPrompt.matchAll(/\[(.*?)\]/g)];
+      let inputPrompt, negativePrompt;
+  
+      if (promptMatches.length > 0) {
+        negativePrompt = promptMatches.map(match => match[1].trim()).join(' '); // Concatenate the negative prompts with a space
+        inputPrompt = fullPrompt;
+        for (const match of promptMatches) {
+          inputPrompt = inputPrompt.replace(match[0], '').trim(); // Removes each negative prompt from the inputPrompt
+        }
+      } else {
+        inputPrompt = fullPrompt; // If no brackets found, use the fullPrompt as the inputPrompt
+        negativePrompt = ""; // Leave negativePrompt as an empty string
+      }
+      await this.pipeline.generate(inputPrompt, negativePrompt, this.#getProgressCallback(), 0, 2);
     } catch (err) {
       this.logger("Generate error, " + err.toString());
       console.log(err.stack);
@@ -610,18 +629,63 @@ tvmjsGlobalEnv.asyncOnGenerate = async function () {
   const outputContainer = document.getElementById("output");
 
   for (let i = 0; i < count; i++) {
-    await localStableDiffusionInst.generate();
+    // Extract input and negative prompts
+    const fullPrompt = document.getElementById('inputPrompt').value;
+    const promptMatches = [...fullPrompt.matchAll(/\[(.*?)\]/g)];
+    let inputPrompt, negativePrompt;
 
-    // Capture the prompts at the time of generation
-    const inputPrompt = document.getElementById('inputPrompt').value;
-    const negativePrompt = document.getElementById('negativePrompt').value;
+    if (promptMatches.length > 0) {
+      negativePrompt = promptMatches.map(match => match[1].trim()).join(' '); // Concatenate the negative prompts with a space
+      inputPrompt = fullPrompt;
+      for (const match of promptMatches) {
+        inputPrompt = inputPrompt.replace(match[0], '').trim(); // Removes each negative prompt from the inputPrompt
+      }
+    } else {
+      inputPrompt = fullPrompt; // If no brackets found, use the fullPrompt as the inputPrompt
+      negativePrompt = ""; // Leave negativePrompt as an empty string
+    }
+
+    // Create a temporary container with a canvas
+    let tempContainer = document.createElement('div');
+    tempContainer.className = 'image-container'; // Add a class for styling
+
+    // Add prompts to the tempContainer
+    let inputPromptElemTemp = document.createElement('p');
+    inputPromptElemTemp.textContent = inputPrompt;
+    inputPromptElemTemp.className = 'input-prompt'; // Add a class for styling
+    tempContainer.appendChild(inputPromptElemTemp);
+
+    // Create a canvas
+    let canvas = document.createElement('canvas');
+    canvas.id = 'preview';
+    canvas.width = 512;
+    canvas.height = 512;
+
+    // Append the canvas to the temporary container
+    tempContainer.appendChild(canvas);
+
+    var progressElement = document.createElement('progress');
+    progressElement.setAttribute('id', 'progress-tracker-progress');
+    progressElement.setAttribute('max', '100');
+    progressElement.setAttribute('value', '0');
+
+    tempContainer.appendChild(progressElement );
+
+    // Insert the temporary container at the beginning of the output container
+    outputContainer.prepend(tempContainer);
+
+    await localStableDiffusionInst.generate();
 
     // Convert offscreen canvas to ImageBitmap
     offscreen.convertToBlob().then(blob => {
       let imgUrl = URL.createObjectURL(blob);
 
+      // Remove the temporary container
+      outputContainer.removeChild(tempContainer);
+
       let timestamp = Date.now().toString();
 
+      // Only save the data when the generation completes
       localforage.setItem(timestamp, { blob, inputPrompt, negativePrompt });
 
       // Create a container
@@ -630,14 +694,9 @@ tvmjsGlobalEnv.asyncOnGenerate = async function () {
 
       // Add prompts to the container
       let inputPromptElem = document.createElement('p');
-      inputPromptElem.textContent = inputPrompt;
+      inputPromptElem.textContent = fullPrompt;
       inputPromptElem.className = 'input-prompt'; // Add a class for styling
       container.appendChild(inputPromptElem);
-
-      let negativePromptElem = document.createElement('p');
-      negativePromptElem.textContent = negativePrompt;
-      negativePromptElem.className = 'negative-prompt'; // Add a class for styling
-      container.appendChild(negativePromptElem);
 
       // Create an image
       let img = new Image();
@@ -654,7 +713,7 @@ tvmjsGlobalEnv.asyncOnGenerate = async function () {
           // Create an anchor element and simulate a click
           let a = document.createElement('a');
           a.href = imgUrl;
-          a.download = `${inputPrompt} - ${negativePrompt}.png`;
+          a.download = `${fullPrompt}.png`;
           a.style.display = 'none';
           document.body.appendChild(a);
           a.click();
@@ -666,7 +725,7 @@ tvmjsGlobalEnv.asyncOnGenerate = async function () {
 
         // Create a delete button
         let delBtn = document.createElement('button');
-        delBtn.textContent = 'X';
+        delBtn.textContent = '✕';
         delBtn.className = 'delete-button'; // Add a class for styling
         delBtn.onclick = function() {
           // Remove the container from the DOM
@@ -679,18 +738,20 @@ tvmjsGlobalEnv.asyncOnGenerate = async function () {
         // Append the delete button to the container
         container.appendChild(delBtn);
 
-        // Get a reference to the first child of the outputContainer
-        let firstChild = outputContainer.firstChild;
+        // Get a reference to the second child of the outputContainer
+        let secondChild = outputContainer.children[1];
 
-        // Insert the new container before the first child
-        outputContainer.insertBefore(container, firstChild);
+        // Insert the new container before the second child
+        outputContainer.insertBefore(container, secondChild);
 
         document.getElementById("progress-tracker-progress").value = 0;
       };
       img.src = imgUrl;
+      clearCanvas()
     });
   }
 };
+
 
 
 tvmjsGlobalEnv.asyncOnRPCServerLoad = async function (tvm) {
